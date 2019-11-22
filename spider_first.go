@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -33,7 +34,8 @@ func fetch(url string) string {
 	return string(body)
 }
 
-func parseUrls(url string, ch chan bool) {
+//func parseUrls(url string, ch chan bool) {
+func parseUrls(url string) {
 	time.Sleep(2 * time.Second)
 	body := fetch(url)
 	body = strings.Replace(body, "\n", "", -1)
@@ -45,19 +47,35 @@ func parseUrls(url string, ch chan bool) {
 		fmt.Println(idRe.FindStringSubmatch(item[1])[1],
 			titleRe.FindStringSubmatch(item[1])[1])
 	}
-	ch <- true // channel信道 当函数逻辑执行结束会给信道ch发送一个布尔值
+	//ch <- true // channel信道 当函数逻辑执行结束会给信道ch发送一个布尔值
 }
 
 func main() {
 	start := time.Now()
-	ch := make(chan bool) //channel信道 从一端发送数据，另一端接收数据 信道需要发送和接收配对，否则会被阻塞
+	//ch := make(chan bool) //channel信道 从一端发送数据，另一端接收数据 信道需要发送和接收配对，否则会被阻塞
+	//for i := 0; i < 10; i++ {
+	//	go parseUrls("https://movie.douban.com/top250?start="+strconv.Itoa(25*i), ch) // 使用goroutine
+	//}
+	//for i := 0; i < 10; i++ {
+	//	<-ch // 接收channel信道
+	//}
+	////time.Sleep(10 * time.Second)
+	//elapsed := time.Since(start)
+	//fmt.Printf("Took %s", elapsed)
+
+	//使用sync.WaitGroup
+	var wg sync.WaitGroup
+	wg.Add(10)
 	for i := 0; i < 10; i++ {
-		go parseUrls("https://movie.douban.com/top250?start="+strconv.Itoa(25*i), ch) // 使用goroutine
+		go func(i int) {
+			defer wg.Done()
+			parseUrls("https://movie.douban.com/top250?start=" + strconv.Itoa(25*i))
+		}(i)
 	}
-	for i := 0; i < 10; i++ {
-		<-ch // 接收channel信道
-	}
-	//time.Sleep(10 * time.Second)
+
+	wg.Wait()
+
 	elapsed := time.Since(start)
-	fmt.Printf("Took %s", elapsed)
+	fmt.Print("Took %s", elapsed)
+
 }
