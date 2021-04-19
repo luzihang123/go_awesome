@@ -26,8 +26,8 @@ func foo3(a string, b int) (r1 int, r2 int) {
 	fmt.Println("a = ", a)
 	fmt.Println("b = ", b)
 
-	// r1 r2 属于foo3的形参，初始化默认的值是10
-	// r1 r2 作用域空间 是foo3 整个函数体的{}空间
+	// r1 r2 属于foo3的形参，初始化默认的值是0
+	// r1 r2 作用域空间是foo3 整个函数体的{}空间
 	fmt.Println("r1 = ", r1)
 	fmt.Println("r2 = ", r2)
 
