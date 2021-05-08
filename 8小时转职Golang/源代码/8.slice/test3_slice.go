@@ -1,3 +1,6 @@
+/*
+slice切片的4种声明定义方式
+*/
 package main
 
 import "fmt"
